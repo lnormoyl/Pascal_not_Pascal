@@ -119,13 +119,42 @@ PUBLIC int main ( int argc, char *argv[] )
 
 PRIVATE void ParseProgram( void )
 {
-    Accept( BEGIN );
-    while ( CurrentToken.code == IDENTIFIER )  {
-        ParseStatement();
-        Accept( SEMICOLON );
+    Accept( PROGRAM );
+    Accept( IDENTIFIER );
+    Accept( SEMICOLON );
+    ParseDeclarations();
+    if ( CurrentToken.code == VAR )  ParseDeclarations();
+    while ( CurrentToken.code == PROCEDURE )  ParseProcDeclaration();
+    ParseBlock();
+    Accept( ENDOFPROGRAM );
+}
+
+/*--------------------------------------------------------------------------*/
+/*                                                                          */
+/*  ParseDeclarations implements:                                           */
+/*                                                                          */
+/*       <Declarations> ::== "VAR" <Variable> { "," <Variable> } ";"        */
+/*                                                                          */
+/*                                                                          */
+/*    Inputs:       None                                                    */
+/*                                                                          */
+/*    Outputs:      None                                                    */
+/*                                                                          */
+/*    Returns:      Nothing                                                 */
+/*                                                                          */
+/*    Side Effects: Lookahead token advanced.                               */
+/*                                                                          */
+/*--------------------------------------------------------------------------*/
+
+PRIVATE void ParseDeclarations( void )
+{
+    Accept( VAR );
+    Accept( IDENTIFIER );
+    while ( CurrentToken.code == COMMA )  {
+        Accept( COMMA );
+        Accept( IDENTIFIER );
     }
-    Accept( END );
-    Accept( ENDOFPROGRAM );     /* Token "." has name ENDOFPROGRAM          */
+    Accept( SEMICOLON );
 }
 
 

@@ -5,9 +5,8 @@
 /*                                                                          */
 /*       Group Members:          ID numbers                                 */
 /*                                                                          */
-/*           John Doe            12345678                                   */
-/*           Jane Murphy         23456789                                   */
-/*           Anthony N. Other    12345679                                   */
+/*           Aaron Moloney       14174014                                   */
+/*           Liam Normoyle       23456789                                   */
 /*                                                                          */
 /*                                                                          */
 /*       Currently just a copy of "smallparser.c".  To create "parser1.c",  */
@@ -69,6 +68,8 @@ PRIVATE int  OpenFiles( int argc, char *argv[] );
 PRIVATE void ParseProgram( void );
 PRIVATE void ParseStatement( void );
 PRIVATE void ParseExpression( void );
+PRIVATE void ParseTerm( void );
+PRIVATE void ParseCompoundTerm( void );
 PRIVATE void Accept( int code );
 PRIVATE void ReadToEndOfFile( void );
 
@@ -177,6 +178,30 @@ PRIVATE void ParseDeclarations( void )
 
 PRIVATE void ParseStatement( void )
 {
+    if (CurrentToken.code == "IF") {
+	
+		
+	}
+
+    else-if (CurrentToken.code == "WHILE"){
+
+	}
+    
+    else-if (CurrentToken.code == "READ"){
+
+	}
+	
+    else-if (CurrentToken.code == "WRITE"){
+
+	}
+
+    else-if (){
+
+	}
+	
+    else (){
+
+	}
     Accept( IDENTIFIER );
     Accept( ASSIGNMENT );       /* ":=" has token name ASSIGNMENT.          */ 
     ParseExpression();
@@ -209,6 +234,55 @@ PRIVATE void ParseExpression( void )
     else  Accept( INTCONST );
 }
 
+
+
+
+
+
+PRIVATE void ParseTerm( void )
+{
+
+	//Term Parse	
+
+	if (CurrentTokencode == "-"){
+		Accept ( "-" );			
+		}
+
+		//SubTerm Parse
+
+		if (CurrentTokencode == VAR) ParseDeclerations();
+	
+		else-if (CurrentTokencode == INTCONST) Accept ( INTCONST );           //May need to handle parsing INTCONST later
+
+		else-if (CurrentTokencode == "("){
+			Accept ( "(" )
+	      	  	if (CurrentTokencode == EXPRESSION) ParseExpression();
+			if (CurrentTokencode == ")" ) Accept ( ")" );
+		else { //HANDLE ERRORS }
+
+		
+
+
+}
+
+
+PRIVATE void ParseCompoundTerm( void )
+{
+
+	//Term Parse	
+
+	ParseTerm();
+
+	//MultOp Parse
+
+	while ( CurrentToken.code == "*"  | CurrentToken.code == "/" ){
+		Accept ( "/" );
+		Accept ( "*" );
+		ParseTerm;
+		}
+		
+
+}
 
 
 /*--------------------------------------------------------------------------*/

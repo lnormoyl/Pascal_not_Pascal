@@ -244,20 +244,21 @@ PRIVATE void ParseTerm( void )
 
 	//Term Parse	
 
-	if (CurrentTokencode == "-"){
+	if (CurrentToken.code == "-"){
 		Accept ( "-" );			
 		}
 
 		//SubTerm Parse
 
-		if (CurrentTokencode == VAR) ParseDeclerations();
+		if (CurrentToken.code == VAR) ParseDeclarations();
 	
-		else-if (CurrentTokencode == INTCONST) Accept ( INTCONST );           //May need to handle parsing INTCONST later
+		else-if (CurrentToken.code == INTCONST) Accept ( INTCONST );           //May need to handle parsing INTCONST later
 
-		else-if (CurrentTokencode == "("){
+		else-if (CurrentToken.code == "("){
 			Accept ( "(" )
-	      	  	if (CurrentTokencode == EXPRESSION) ParseExpression();
-			if (CurrentTokencode == ")" ) Accept ( ")" );
+	      	  	ParseExpression();
+			Accept ( ")" );
+			//HANDLE ERROR
 		else { //HANDLE ERRORS }
 
 		

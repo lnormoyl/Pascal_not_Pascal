@@ -68,6 +68,7 @@ PRIVATE int  OpenFiles( int argc, char *argv[] );
 PRIVATE void ParseProgram( void );
 PRIVATE void ParseStatement( void );
 PRIVATE void ParseExpression( void );
+PRIVATE void ParseAssignment( void );
 PRIVATE void ParseCompoundExpression( void );
 PRIVATE void ParseTerm( void );
 PRIVATE void ParseCompoundTerm( void );

@@ -233,7 +233,7 @@ PRIVATE void ParseExpression( void )
 	
 	ParseCompoundTerm();
 
-	if ( CurrentToken.code == "+" | CurrentToken.code == "-"  )  {
+	while ( CurrentToken.code == "+" | CurrentToken.code == "-"  )  {
 		Accept( "+" );
 		Accept( "-" );
 		ParseCompoundTerm();
@@ -244,7 +244,22 @@ PRIVATE void ParseExpression( void )
 }
 
 
+PRIVATE void ParseBooleanExpression( void )
+{
+	
+	ParseExpression();
 
+	if ( CurrentToken.code == "=" | CurrentToken.code == "<=" | CurrentToken.code == ">=" | CurrentToken.code == "<" | CurrentToken.code == ">" )  {
+		Accept( "=" );
+		Accept( "<=" );
+		Accept( ">=" );
+		Accept( "<" );
+		Accept( ">" );
+	}
+
+	ParseExpression();
+
+}
 
 
 

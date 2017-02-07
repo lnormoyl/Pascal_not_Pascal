@@ -230,8 +230,17 @@ PRIVATE void ParseStatement( void )
 
 PRIVATE void ParseExpression( void )
 {
-    if ( CurrentToken.code == IDENTIFIER )  Accept( IDENTIFIER );
-    else  Accept( INTCONST );
+	
+	ParseCompoundTerm();
+
+	if ( CurrentToken.code == "+" | CurrentToken.code == "-"  )  {
+		Accept( "+" );
+		Accept( "-" );
+		ParseCompoundTerm();
+	}
+
+
+
 }
 
 

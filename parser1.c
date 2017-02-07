@@ -68,6 +68,7 @@ PRIVATE int  OpenFiles( int argc, char *argv[] );
 PRIVATE void ParseProgram( void );
 PRIVATE void ParseStatement( void );
 PRIVATE void ParseExpression( void );
+PRIVATE void ParseCompoundExpression( void );
 PRIVATE void ParseTerm( void );
 PRIVATE void ParseCompoundTerm( void );
 PRIVATE void Accept( int code );
@@ -261,6 +262,16 @@ PRIVATE void ParseBooleanExpression( void )
 
 }
 
+PRIVATE void ParseAssignment( void )
+{
+	
+	if (CurrentToken.code == "="){
+		Accept ( "=" );			
+		}
+
+	ParseExpression();
+
+}
 
 
 PRIVATE void ParseTerm( void )

@@ -72,6 +72,7 @@ PRIVATE void ParseAssignment( void );
 PRIVATE void ParseCompoundExpression( void );
 PRIVATE void ParseTerm( void );
 PRIVATE void ParseWriteStatement( void );
+PRIVATE void ParseReadStatement( void )
 PRIVATE void ParseCompoundTerm( void );
 PRIVATE void Accept( int code );
 PRIVATE void ReadToEndOfFile( void );
@@ -252,13 +253,12 @@ PRIVATE void ParseBooleanExpression( void )
 	
 	ParseExpression();
 
-	if ( CurrentToken.code == "=" | CurrentToken.code == "<=" | CurrentToken.code == ">=" | CurrentToken.code == "<" | CurrentToken.code == ">" )  {
-		Accept( "=" );
-		Accept( "<=" );
-		Accept( ">=" );
-		Accept( "<" );
-		Accept( ">" );
-	}
+	switch (CurrentToken){
+		case '=':	Accept( "=" );
+		case '<=':  	Accept( "<=" );
+		case '>=':	Accept( ">=" );
+		case '<':	Accept( "<" );
+		default: 	Accept ( ">" )
 
 	ParseExpression();
 
@@ -266,29 +266,36 @@ PRIVATE void ParseBooleanExpression( void )
 
 PRIVATE void ParseWriteStatement( void )
 {
-	
-	if (CurrentToken.code == "WRITE"){
-		Accept ( "WRITE" );			
-		if (CurrentToken.code == "("){
-			Accept ( "(" );	
-			ParseExpression();	
+
+	Accept ( "WRITE" );	
+	Accept ( "(" );	
+	ParseExpression();	
 			
-			if (CurrentToken.code == ","){
-				Accept ( "," );	
-				ParseExpression();
-				if (CurrentToken.code == ")"){
-					Accept ( ")" );			
-				}
-			}
+	while (CurrentToken.code == ","){
+		Accept ( "," );	
+		ParseExpression();
 		}
 
-	}
-	
-	
-
-	
+	Accept ( ")" );			
 
 }
+
+PRIVATE void ParseReadStatement( void )
+{
+
+	Accept ( "READ" );	
+	Accept ( "(" );	
+	ParseDeclaration();	
+			
+	while (CurrentToken.code == ","){
+		Accept ( "," );	
+		ParseExpression();
+		}
+
+	Accept ( ")" );			
+
+}
+
 
 
 PRIVATE void ParseAssignment( void )
@@ -314,20 +321,15 @@ PRIVATE void ParseTerm( void )
 
 		//SubTerm Parse
 
-		if (CurrentToken.code == VAR) ParseDeclarations();
+		switch (CurrentToken){
+			case VAR:	ParseDeclarations();
+			case INTCONST:  Accept ( INTCONST ); 	//May need to handle parsing INTCONST later
+			default: {
+				Accept ( "(" )
+	      	  		ParseExpression();
+				Accept ( ")" );
+				}
 	
-		else-if (CurrentToken.code == INTCONST) Accept ( INTCONST );           //May need to handle parsing INTCONST later
-
-		else-if (CurrentToken.code == "("){
-			Accept ( "(" )
-	      	  	ParseExpression();
-			Accept ( ")" );
-			//HANDLE ERROR
-		else { //HANDLE ERRORS }
-
-		
-
-
 }
 
 

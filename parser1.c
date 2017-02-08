@@ -72,11 +72,14 @@ PRIVATE void ParseAssignment( void );
 PRIVATE void ParseCompoundExpression( void );
 PRIVATE void ParseTerm( void );
 PRIVATE void ParseWriteStatement( void );
+PRIVATE void ParseIfStatement( void );
+PRIVATE void ParseWhileStatement( void );
+PRIVATE void ParseBlock( void );
 PRIVATE void ParseReadStatement( void )
 PRIVATE void ParseCompoundTerm( void );
 PRIVATE void Accept( int code );
 PRIVATE void ReadToEndOfFile( void );
-
+PRIVATE void ParseActualParameter( void );
 
 /*--------------------------------------------------------------------------*/
 /*                                                                          */
@@ -182,33 +185,7 @@ PRIVATE void ParseDeclarations( void )
 
 PRIVATE void ParseStatement( void )
 {
-    if (CurrentToken.code == "IF") {
 	
-		
-	}
-
-    else-if (CurrentToken.code == "WHILE"){
-
-	}
-    
-    else-if (CurrentToken.code == "READ"){
-
-	}
-	
-    else-if (CurrentToken.code == "WRITE"){
-
-	}
-
-    else-if (){
-
-	}
-	
-    else (){
-
-	}
-    Accept( IDENTIFIER );
-    Accept( ASSIGNMENT );       /* ":=" has token name ASSIGNMENT.          */ 
-    ParseExpression();
 }
 
 
@@ -247,6 +224,19 @@ PRIVATE void ParseExpression( void )
 
 }
 
+PRIVATE void ParseBlock( void )
+{
+	
+	Accept( "BEGIN" );
+	
+	while ( CurrentToken.code == "+" | CurrentToken.code == "-"  )  {	
+		ParseStatement();
+		Accept( ";" );	
+	}
+	
+	Accept( "END" );
+
+}
 
 PRIVATE void ParseBooleanExpression( void )
 {
@@ -262,6 +252,39 @@ PRIVATE void ParseBooleanExpression( void )
 
 	ParseExpression();
 
+}
+
+PRIVATE void ParseIfStatement( void )
+{
+
+	Accept ( "IF" );	
+	ParseBooleanExpression();
+	Accept ( "THEN" );
+	ParseBlock();
+	while (CurrentToken.code == "ELSE"){
+		Accept ( "ELSE" );	
+		ParseBlock();
+		}
+}
+
+PRIVATE void ParseWhileStatement( void )
+{
+
+	Accept ( "WHILE" );	
+	ParseBooleanExpression();
+	Accept ( "DO" );
+	ParseBlock();
+	
+}
+
+PRIVATE void ParseActualParameter( void )
+{
+
+	switch (CurrentToken){
+		case VAR:	Accept( VAR );
+		default: 	ParseExpression();
+
+	
 }
 
 PRIVATE void ParseWriteStatement( void )
@@ -351,6 +374,21 @@ PRIVATE void ParseCompoundTerm( void )
 
 }
 
+
+PRIVATE void ParseProcCallList( void )
+{
+
+	Accept ( "(" );	
+	ParseActualParameter();	
+			
+	while (CurrentToken.code == ","){
+		Accept ( "," );	
+		ParseActualParameter();	
+		}
+
+	Accept ( ")" );			
+
+}
 
 /*--------------------------------------------------------------------------*/
 /*                                                                          */

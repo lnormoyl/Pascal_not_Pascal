@@ -71,6 +71,7 @@ PRIVATE void ParseExpression( void );
 PRIVATE void ParseAssignment( void );
 PRIVATE void ParseCompoundExpression( void );
 PRIVATE void ParseTerm( void );
+PRIVATE void ParseWriteStatement( void );
 PRIVATE void ParseCompoundTerm( void );
 PRIVATE void Accept( int code );
 PRIVATE void ReadToEndOfFile( void );
@@ -262,6 +263,33 @@ PRIVATE void ParseBooleanExpression( void )
 	ParseExpression();
 
 }
+
+PRIVATE void ParseWriteStatement( void )
+{
+	
+	if (CurrentToken.code == "WRITE"){
+		Accept ( "WRITE" );			
+		if (CurrentToken.code == "("){
+			Accept ( "(" );	
+			ParseExpression();	
+			
+			if (CurrentToken.code == ","){
+				Accept ( "," );	
+				ParseExpression();
+				if (CurrentToken.code == ")"){
+					Accept ( ")" );			
+				}
+			}
+		}
+
+	}
+	
+	
+
+	
+
+}
+
 
 PRIVATE void ParseAssignment( void )
 {

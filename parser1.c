@@ -64,10 +64,13 @@ PRIVATE TOKEN  CurrentToken;       /*  Parser lookahead token.  Updated by  */
 /*                                                                          */
 /*--------------------------------------------------------------------------*/
 
+//TODO: Arrange function declarations and body declarations according to the grammar.pdf
+
 PRIVATE int  OpenFiles( int argc, char *argv[] );
 PRIVATE void ParseProgram( void );
 PRIVATE void ParseStatement( void );
 PRIVATE void ParseExpression( void );
+PRIVATE void ParseDeclaration( void); 
 PRIVATE void ParseAssignment( void );
 PRIVATE void ParseCompoundExpression( void );
 PRIVATE void ParseTerm( void );
@@ -80,6 +83,17 @@ PRIVATE void ParseCompoundTerm( void );
 PRIVATE void Accept( int code );
 PRIVATE void ReadToEndOfFile( void );
 PRIVATE void ParseActualParameter( void );
+//TODO: ParseProcCallList();
+//TODO: ParseRestOfStatement();
+//TODO: ParseSimpleStatement();
+//TODO: ParseStatement();
+//TODO: ParseFormalParameter();
+//TODO: ParseParameterList();
+//TODO: ParseProcDeclaration();
+
+//TODO: ReadToEndOfFile(): might not be working
+
+
 
 /*--------------------------------------------------------------------------*/
 /*                                                                          */
@@ -213,7 +227,7 @@ PRIVATE void ParseExpression( void )
 {
 	
 	ParseCompoundTerm();
-
+	//TODO: SAME AS PROBLEM BELOW
 	while ( CurrentToken.code == "+" | CurrentToken.code == "-"  )  {
 		Accept( "+" );
 		Accept( "-" );
@@ -228,8 +242,9 @@ PRIVATE void ParseBlock( void )
 {
 	
 	Accept( "BEGIN" );
+	//TODO: Replace with parameters
 	
-	while ( CurrentToken.code == "+" | CurrentToken.code == "-"  )  {	
+	while ( //TODO: Something else here )  {	
 		ParseStatement();
 		Accept( ";" );	
 	}
@@ -242,7 +257,7 @@ PRIVATE void ParseBooleanExpression( void )
 {
 	
 	ParseExpression();
-
+	//TODO: REPLACE ALL OF THESE WITH PARAMETERS DEFINED AND USED BY THE ACCEPT FUNCTION
 	switch (CurrentToken){
 		case '=':	Accept( "=" );
 		case '<=':  	Accept( "<=" );
@@ -261,7 +276,8 @@ PRIVATE void ParseIfStatement( void )
 	ParseBooleanExpression();
 	Accept ( "THEN" );
 	ParseBlock();
-	while (CurrentToken.code == "ELSE"){
+	//TODO: Replace with PARAMETERS, (check what it is)
+	if (CurrentToken.code == "ELSE"){
 		Accept ( "ELSE" );	
 		ParseBlock();
 		}
@@ -269,7 +285,7 @@ PRIVATE void ParseIfStatement( void )
 
 PRIVATE void ParseWhileStatement( void )
 {
-
+	//TODO Replace with parameters 
 	Accept ( "WHILE" );	
 	ParseBooleanExpression();
 	Accept ( "DO" );
@@ -290,7 +306,7 @@ PRIVATE void ParseActualParameter( void )
 PRIVATE void ParseWriteStatement( void )
 {
 
-	Accept ( "WRITE" );	
+	Accept ( "WRITE" ); //TODO Accept(WRITE) I think check this	
 	Accept ( "(" );	
 	ParseExpression();	
 			
@@ -306,7 +322,7 @@ PRIVATE void ParseWriteStatement( void )
 PRIVATE void ParseReadStatement( void )
 {
 
-	Accept ( "READ" );	
+	Accept ( "READ" );	//TODO: Accept (READ) maybe
 	Accept ( "(" );	
 	ParseDeclaration();	
 			
@@ -323,7 +339,7 @@ PRIVATE void ParseReadStatement( void )
 
 PRIVATE void ParseAssignment( void )
 {
-	
+	//TODO: Check paramters in accept routine here also
 	if (CurrentToken.code == "="){
 		Accept ( "=" );			
 		}
@@ -337,7 +353,7 @@ PRIVATE void ParseTerm( void )
 {
 
 	//Term Parse	
-
+	//TODO: Replace with #Defines instead of explicit chars
 	if (CurrentToken.code == "-"){
 		Accept ( "-" );			
 		}
@@ -345,6 +361,7 @@ PRIVATE void ParseTerm( void )
 		//SubTerm Parse
 
 		switch (CurrentToken){
+				//VAR-->IDENTIFIER
 			case VAR:	ParseDeclarations();
 			case INTCONST:  Accept ( INTCONST ); 	//May need to handle parsing INTCONST later
 			default: {
@@ -364,11 +381,12 @@ PRIVATE void ParseCompoundTerm( void )
 	ParseTerm();
 
 	//MultOp Parse
-
+	//TODO REPLACE WITH PARAMETERS 
 	while ( CurrentToken.code == "*"  | CurrentToken.code == "/" ){
+		//TODO: CASE OR IF ELSE STATEMENT HERE TO HANDLE LOGIC CORRECTLY
 		Accept ( "/" );
 		Accept ( "*" );
-		ParseTerm;
+		ParseTerm();
 		}
 		
 

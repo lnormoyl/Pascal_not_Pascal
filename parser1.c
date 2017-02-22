@@ -83,13 +83,13 @@ PRIVATE void ParseCompoundTerm( void );
 PRIVATE void Accept( int code );
 PRIVATE void ReadToEndOfFile( void );
 PRIVATE void ParseActualParameter( void );
-//TODO: ParseProcCallList();
-//TODO: ParseRestOfStatement();
-//TODO: ParseSimpleStatement();
-//TODO: ParseStatement();
-//TODO: ParseFormalParameter();
-//TODO: ParseParameterList();
-//TODO: ParseProcDeclaration();
+PRIVATE void ParseProcCallList( void )
+PRIVATE void ParseRestOfStatement( void )
+PRIVATE void ParseSimpleStatement( void )
+PRIVATE void ParseStatement( void )
+PRIVATE void ParseFormalParameter( void )
+PRIVATE void ParseParameterList( void )
+PRIVATE void ParseProcDeclaration( void )
 
 //TODO: ReadToEndOfFile(): might not be working
 
@@ -151,6 +151,70 @@ PRIVATE void ParseProgram( void )
     Accept( ENDOFPROGRAM );
 }
 
+
+
+
+PRIVATE void ParseProcDeclaration( void )
+{
+    Accept( PROCEDURE );
+    Accept( IDENTIFIER );
+    Accept( SEMICOLON );
+    ParseDeclarations();
+    if ( CurrentToken.code == VAR )  ParseDeclarations();
+    while ( CurrentToken.code == PROCEDURE )  ParseProcDeclaration();
+    ParseBlock();
+    Accept( SEMICOLON );
+}
+
+
+
+PRIVATE void ParseFormalParameter( void )
+{
+ 
+	if ( CurrentToken.code == "REF" )  Accept( "REF");
+	Accept ( VAR );
+}
+
+
+
+PRIVATE void ParseProcCallList( void )
+{
+    	Accept( "(" );
+	ParseActualParameter();
+    	while ( CurrentToken.code == COMMA ) ParseActualParameter();
+    	Accept( ")" );
+}
+
+
+
+
+PRIVATE void ParseParameterList( void )
+{
+    	Accept( "(" );
+	ParseFormalParameter();
+    	while ( CurrentToken.code == COMMA ) ParseFormalParameter();
+    	Accept( ")" );
+}
+
+
+
+
+
+
+
+
+
+
+PRIVATE void ParseRestOfStatement( void )
+{
+	ParseProcCallList();
+	switch (CurrentToken){
+		case:	ParseProcCallList();
+		case:	ParseAssignment();
+		default: {
+				//TODO Put in null
+				}
+}
 /*--------------------------------------------------------------------------*/
 /*                                                                          */
 /*  ParseDeclarations implements:                                           */
@@ -180,6 +244,14 @@ PRIVATE void ParseDeclarations( void )
 }
 
 
+
+PRIVATE void ParseSimpleStatement( void )
+{
+    Accept( VARORPROCNAME );
+    ParseRestOfStatement();
+}
+
+
 /*--------------------------------------------------------------------------*/
 /*                                                                          */
 /*  ParseStatement implements:                                              */
@@ -200,6 +272,15 @@ PRIVATE void ParseDeclarations( void )
 PRIVATE void ParseStatement( void )
 {
 	
+	switch (CurrentToken){
+		case:	ParseSimpleStatement();
+		case:	ParseWhileStatement();
+		case:	ParseIfStatement();
+		case:	ParseReadStatement();
+		default: {
+				ParseWriteStatement();
+				}
+
 }
 
 

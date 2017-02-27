@@ -69,7 +69,7 @@ PRIVATE int  OpenFiles( int argc, char *argv[] );
 
 PRIVATE void ParseProgram( void );
 PRIVATE void ParseProcDeclaration( void );
-PRIVATE void ParseDeclaration( void); 
+PRIVATE void ParseDeclarations( void); 
 PRIVATE void ParseParameterList( void );
 PRIVATE void ParseFormalParameter( void );
 PRIVATE void ParseBlock( void );
@@ -91,7 +91,7 @@ PRIVATE void ParseBooleanExpression( void );
 PRIVATE void Accept( int code );
 PRIVATE void ReadToEndOfFile( void );
 
-//TODO: ReadToEndOfFile(): might not be working
+
 
 
 
@@ -186,8 +186,8 @@ PRIVATE void ParseProcDeclaration( void )
 {
     Accept( PROCEDURE );
     Accept( IDENTIFIER );
+    if ( CurrentToken.code == LEFTPARENTHESIS )  ParseParameterList();
     Accept( SEMICOLON );
-    ParseDeclarations();
     if ( CurrentToken.code == VAR )  ParseDeclarations();
     while ( CurrentToken.code == PROCEDURE )  ParseProcDeclaration();
     ParseBlock();
@@ -197,10 +197,10 @@ PRIVATE void ParseProcDeclaration( void )
 
 PRIVATE void ParseParameterList( void )
 {
-    	Accept( LEFTPARENTHESIS );
+    Accept( LEFTPARENTHESIS );
 	ParseFormalParameter();
-    	while ( CurrentToken.code == COMMA ) ParseFormalParameter();
-    	Accept( RIGHTPARENTHESIS );
+    while ( CurrentToken.code == COMMA ) ParseFormalParameter();
+    Accept( RIGHTPARENTHESIS );
 }
 
 
@@ -208,7 +208,7 @@ PRIVATE void ParseFormalParameter( void )
 {
  
 	if ( CurrentToken.code == REF )  Accept( REF);
-	Accept ( VAR );
+	Accept ( IDENTIFIER );
 }
 
 
@@ -248,34 +248,35 @@ PRIVATE void ParseBlock( void )
 PRIVATE void ParseStatement( void )
 {
 	
-	switch (CurrentToken){
-		case:	ParseSimpleStatement();
-		case:	ParseWhileStatement();
-		case:	ParseIfStatement();
-		case:	ParseReadStatement();
-		default: {
-				ParseWriteStatement();
-				}
+	switch (CurrentToken.code)
+		{
+		case WRITE:		ParseWriteStatement();
+		case WHILE:		ParseWhileStatement();
+		case IF:		ParseIfStatement();
+		case READ:		ParseReadStatement();
+		default:		ParseSimpleStatement();
+		}
+
 
 }
 
 
 PRIVATE void ParseSimpleStatement( void )
 {
-    Accept( VARORPROCNAME );
+    Accept( IDENTIFIER );
     ParseRestOfStatement();
 }
 
 
 PRIVATE void ParseRestOfStatement( void )
 {
-	ParseProcCallList();
-	switch (CurrentToken){
-		case:	ParseProcCallList();
-		case:	ParseAssignment();
-		default: {
-				//TODO Put in null
-				}
+
+	switch (CurrentToken.code)
+		{
+		case LEFTPARENTHESIS:	ParseProcCallList();
+		case ASSIGNMENT:	ParseAssignment();
+		default:		Accept( ENDOFINPUT );
+		}
 }
 
 
@@ -291,9 +292,9 @@ PRIVATE void ParseProcCallList( void )
 
 PRIVATE void ParseAssignment( void )
 {
-
-	if (CurrentToken.code == EQUALITY){
-		Accept ( EQUALITY );			
+	
+	if (CurrentToken.code == ASSIGNMENT){
+		Accept ( ASSIGNMENT );			
 		}
 
 	ParseExpression();
@@ -304,10 +305,11 @@ PRIVATE void ParseAssignment( void )
 PRIVATE void ParseActualParameter( void )
 {
 
-	switch (CurrentToken){
+	switch (CurrentToken.code)
+		{
 		case VAR:	Accept( VAR );
 		default: 	ParseExpression();
-
+		}
 	
 }
 
@@ -343,7 +345,7 @@ PRIVATE void ParseReadStatement( void )
 
 	Accept ( READ );	
 	Accept ( LEFTPARENTHESIS );	
-	ParseDeclaration();	
+	ParseDeclarations();	
 			
 	while (CurrentToken.code == COMMA){
 		Accept ( COMMA );	
@@ -394,12 +396,12 @@ PRIVATE void ParseWriteStatement( void )
 
 PRIVATE void ParseExpression( void )
 {
-	
+	printf("here 0!\n");
 	ParseCompoundTerm();
-
-	while ( CurrentToken.code == ADD | CurrentToken.code == SUBTRACT  )  {
-		Accept( ADD );
-		Accept( SUBTRACT );
+	printf("here 1!\n");
+	while ( (CurrentToken.code == ADD) || (CurrentToken.code == SUBTRACT)  )  {
+		printf("here 2!\n");
+		Accept( CurrentToken.code );
 		ParseCompoundTerm();
 	}
 
@@ -411,14 +413,14 @@ PRIVATE void ParseExpression( void )
 PRIVATE void ParseCompoundTerm( void )
 {
 
-	//Term Parse	
+	/*Term Parse*/	
 
 	ParseTerm();
 
-	//MultOp Parse
+	/*MultOp Parse*/
 
-	while ( CurrentToken.code == MULTIPLY  | CurrentToken.code == DIVIDE ){
-		//TODO: CASE OR IF ELSE STATEMENT HERE TO HANDLE LOGIC CORRECTLY
+	while ( (CurrentToken.code == MULTIPLY)  | (CurrentToken.code == DIVIDE) ){
+		/*TODO: CASE OR IF ELSE STATEMENT HERE TO HANDLE LOGIC CORRECTLY*/
 		Accept ( MULTIPLY );
 		Accept ( DIVIDE );
 		ParseTerm();
@@ -431,23 +433,22 @@ PRIVATE void ParseCompoundTerm( void )
 PRIVATE void ParseTerm( void )
 {
 
-	//Term Parse	
+	/*Term Parse*/	
 
-	if (CurrentToken.code == SUBTRACT){
-		Accept ( SUBTRACT );			
-		}
-
-		//SubTerm Parse
-
-		switch (CurrentToken){
-				//VAR-->IDENTIFIER
-			case VAR:	ParseDeclarations();
-			case INTCONST:  Accept ( INTCONST ); 	//May need to handle parsing INTCONST later
-			default: {
-				Accept ( LEFTPARENTHESIS )
-	      	  		ParseExpression();
-				Accept ( RIGHTPARENTHESIS );
-				}
+	if (CurrentToken.code == SUBTRACT) Accept ( SUBTRACT );			
+	
+		printf("here 2!\n");
+		/*SubTerm Parse*/
+		switch (CurrentToken.code)
+			{
+			case IDENTIFIER:	Accept ( IDENTIFIER );
+			case INTCONST:  	Accept ( INTCONST ); 
+			default:	{
+						Accept ( LEFTPARENTHESIS );
+	      	  			ParseExpression();
+						Accept ( RIGHTPARENTHESIS );
+						}
+			}
 	
 }
 
@@ -457,12 +458,13 @@ PRIVATE void ParseBooleanExpression( void )
 	
 	ParseExpression();
 
-	switch (CurrentToken){
+	switch (CurrentToken.code){
 		case EQUALITY		:	Accept( EQUALITY );
 		case LESSEQUAL		:  	Accept( LESSEQUAL );
 		case GREATEREQUAL	:	Accept( GREATEREQUAL );
-		case LESS		:	Accept( LESS );
-		default			: 	Accept ( GREATER )
+		case LESS			:	Accept( LESS );
+		default				: 	Accept ( GREATER );
+		}
 
 	ParseExpression();
 

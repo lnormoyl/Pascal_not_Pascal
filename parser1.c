@@ -67,29 +67,30 @@ PRIVATE TOKEN  CurrentToken;       /*  Parser lookahead token.  Updated by  */
 //TODO: Arrange function declarations and body declarations according to the grammar.pdf
 
 PRIVATE int  OpenFiles( int argc, char *argv[] );
+
 PRIVATE void ParseProgram( void );
-PRIVATE void ParseStatement( void );
-PRIVATE void ParseExpression( void );
+PRIVATE void ParseProcDeclaration( void );
 PRIVATE void ParseDeclaration( void); 
-PRIVATE void ParseAssignment( void );
-PRIVATE void ParseCompoundExpression( void );
-PRIVATE void ParseTerm( void );
-PRIVATE void ParseWriteStatement( void );
-PRIVATE void ParseIfStatement( void );
-PRIVATE void ParseWhileStatement( void );
+PRIVATE void ParseParameterList( void );
+PRIVATE void ParseFormalParameter( void );
 PRIVATE void ParseBlock( void );
-PRIVATE void ParseReadStatement( void )
+PRIVATE void ParseStatement( void );
+PRIVATE void ParseSimpleStatement( void );
+PRIVATE void ParseRestOfStatement( void );
+PRIVATE void ParseProcCallList( void );
+PRIVATE void ParseAssignment( void );
+PRIVATE void ParseActualParameter( void );
+PRIVATE void ParseWhileStatement( void );
+PRIVATE void ParseIfStatement( void );
+PRIVATE void ParseReadStatement( void );
+PRIVATE void ParseWriteStatement( void );
+PRIVATE void ParseExpression( void );
 PRIVATE void ParseCompoundTerm( void );
+PRIVATE void ParseTerm( void );
+PRIVATE void ParseBooleanExpression( void );
+
 PRIVATE void Accept( int code );
 PRIVATE void ReadToEndOfFile( void );
-PRIVATE void ParseActualParameter( void );
-PRIVATE void ParseProcCallList( void )
-PRIVATE void ParseRestOfStatement( void )
-PRIVATE void ParseSimpleStatement( void )
-PRIVATE void ParseStatement( void )
-PRIVATE void ParseFormalParameter( void )
-PRIVATE void ParseParameterList( void )
-PRIVATE void ParseProcDeclaration( void )
 
 //TODO: ReadToEndOfFile(): might not be working
 
@@ -153,68 +154,6 @@ PRIVATE void ParseProgram( void )
 
 
 
-
-PRIVATE void ParseProcDeclaration( void )
-{
-    Accept( PROCEDURE );
-    Accept( IDENTIFIER );
-    Accept( SEMICOLON );
-    ParseDeclarations();
-    if ( CurrentToken.code == VAR )  ParseDeclarations();
-    while ( CurrentToken.code == PROCEDURE )  ParseProcDeclaration();
-    ParseBlock();
-    Accept( SEMICOLON );
-}
-
-
-
-PRIVATE void ParseFormalParameter( void )
-{
- 
-	if ( CurrentToken.code == "REF" )  Accept( "REF");
-	Accept ( VAR );
-}
-
-
-
-PRIVATE void ParseProcCallList( void )
-{
-    	Accept( "(" );
-	ParseActualParameter();
-    	while ( CurrentToken.code == COMMA ) ParseActualParameter();
-    	Accept( ")" );
-}
-
-
-
-
-PRIVATE void ParseParameterList( void )
-{
-    	Accept( "(" );
-	ParseFormalParameter();
-    	while ( CurrentToken.code == COMMA ) ParseFormalParameter();
-    	Accept( ")" );
-}
-
-
-
-
-
-
-
-
-
-
-PRIVATE void ParseRestOfStatement( void )
-{
-	ParseProcCallList();
-	switch (CurrentToken){
-		case:	ParseProcCallList();
-		case:	ParseAssignment();
-		default: {
-				//TODO Put in null
-				}
-}
 /*--------------------------------------------------------------------------*/
 /*                                                                          */
 /*  ParseDeclarations implements:                                           */
@@ -244,11 +183,49 @@ PRIVATE void ParseDeclarations( void )
 }
 
 
-
-PRIVATE void ParseSimpleStatement( void )
+PRIVATE void ParseProcDeclaration( void )
 {
-    Accept( VARORPROCNAME );
-    ParseRestOfStatement();
+    Accept( PROCEDURE );
+    Accept( IDENTIFIER );
+    Accept( SEMICOLON );
+    ParseDeclarations();
+    if ( CurrentToken.code == VAR )  ParseDeclarations();
+    while ( CurrentToken.code == PROCEDURE )  ParseProcDeclaration();
+    ParseBlock();
+    Accept( SEMICOLON );
+}
+
+
+PRIVATE void ParseParameterList( void )
+{
+    	Accept( "(" );
+	ParseFormalParameter();
+    	while ( CurrentToken.code == COMMA ) ParseFormalParameter();
+    	Accept( ")" );
+}
+
+
+PRIVATE void ParseFormalParameter( void )
+{
+ 
+	if ( CurrentToken.code == "REF" )  Accept( "REF");
+	Accept ( VAR );
+}
+
+
+PRIVATE void ParseBlock( void )
+{
+	
+	Accept( "BEGIN" );
+	//TODO: Replace with parameters
+	
+	while ( //TODO: Something else here )  {	
+		ParseStatement();
+		Accept( ";" );	
+	}
+	
+	Accept( "END" );
+
 }
 
 
@@ -280,6 +257,118 @@ PRIVATE void ParseStatement( void )
 		default: {
 				ParseWriteStatement();
 				}
+
+}
+
+
+PRIVATE void ParseSimpleStatement( void )
+{
+    Accept( VARORPROCNAME );
+    ParseRestOfStatement();
+}
+
+
+PRIVATE void ParseRestOfStatement( void )
+{
+	ParseProcCallList();
+	switch (CurrentToken){
+		case:	ParseProcCallList();
+		case:	ParseAssignment();
+		default: {
+				//TODO Put in null
+				}
+}
+
+
+
+PRIVATE void ParseProcCallList( void )
+{
+    	Accept( "(" );
+	ParseActualParameter();
+    	while ( CurrentToken.code == COMMA ) ParseActualParameter();
+    	Accept( ")" );
+}
+
+
+PRIVATE void ParseAssignment( void )
+{
+	//TODO: Check paramters in accept routine here also
+	if (CurrentToken.code == "="){
+		Accept ( "=" );			
+		}
+
+	ParseExpression();
+
+}
+
+
+PRIVATE void ParseActualParameter( void )
+{
+
+	switch (CurrentToken){
+		case VAR:	Accept( VAR );
+		default: 	ParseExpression();
+
+	
+}
+
+
+PRIVATE void ParseWhileStatement( void )
+{
+	//TODO Replace with parameters 
+	Accept ( "WHILE" );	
+	ParseBooleanExpression();
+	Accept ( "DO" );
+	ParseBlock();
+	
+}
+
+
+PRIVATE void ParseIfStatement( void )
+{
+
+	Accept ( "IF" );	
+	ParseBooleanExpression();
+	Accept ( "THEN" );
+	ParseBlock();
+	//TODO: Replace with PARAMETERS, (check what it is)
+	if (CurrentToken.code == "ELSE"){
+		Accept ( "ELSE" );	
+		ParseBlock();
+		}
+}
+
+
+PRIVATE void ParseReadStatement( void )
+{
+
+	Accept ( "READ" );	//TODO: Accept (READ) maybe
+	Accept ( "(" );	
+	ParseDeclaration();	
+			
+	while (CurrentToken.code == ","){
+		Accept ( "," );	
+		ParseExpression();
+		}
+
+	Accept ( ")" );			
+
+}
+
+
+PRIVATE void ParseWriteStatement( void )
+{
+
+	Accept ( "WRITE" ); //TODO Accept(WRITE) I think check this	
+	Accept ( "(" );	
+	ParseExpression();	
+			
+	while (CurrentToken.code == ","){
+		Accept ( "," );	
+		ParseExpression();
+		}
+
+	Accept ( ")" );			
 
 }
 
@@ -319,113 +408,23 @@ PRIVATE void ParseExpression( void )
 
 }
 
-PRIVATE void ParseBlock( void )
-{
-	
-	Accept( "BEGIN" );
-	//TODO: Replace with parameters
-	
-	while ( //TODO: Something else here )  {	
-		ParseStatement();
-		Accept( ";" );	
-	}
-	
-	Accept( "END" );
 
-}
-
-PRIVATE void ParseBooleanExpression( void )
-{
-	
-	ParseExpression();
-	//TODO: REPLACE ALL OF THESE WITH PARAMETERS DEFINED AND USED BY THE ACCEPT FUNCTION
-	switch (CurrentToken){
-		case '=':	Accept( "=" );
-		case '<=':  	Accept( "<=" );
-		case '>=':	Accept( ">=" );
-		case '<':	Accept( "<" );
-		default: 	Accept ( ">" )
-
-	ParseExpression();
-
-}
-
-PRIVATE void ParseIfStatement( void )
+PRIVATE void ParseCompoundTerm( void )
 {
 
-	Accept ( "IF" );	
-	ParseBooleanExpression();
-	Accept ( "THEN" );
-	ParseBlock();
-	//TODO: Replace with PARAMETERS, (check what it is)
-	if (CurrentToken.code == "ELSE"){
-		Accept ( "ELSE" );	
-		ParseBlock();
+	//Term Parse	
+
+	ParseTerm();
+
+	//MultOp Parse
+	//TODO REPLACE WITH PARAMETERS 
+	while ( CurrentToken.code == "*"  | CurrentToken.code == "/" ){
+		//TODO: CASE OR IF ELSE STATEMENT HERE TO HANDLE LOGIC CORRECTLY
+		Accept ( "/" );
+		Accept ( "*" );
+		ParseTerm();
 		}
-}
-
-PRIVATE void ParseWhileStatement( void )
-{
-	//TODO Replace with parameters 
-	Accept ( "WHILE" );	
-	ParseBooleanExpression();
-	Accept ( "DO" );
-	ParseBlock();
-	
-}
-
-PRIVATE void ParseActualParameter( void )
-{
-
-	switch (CurrentToken){
-		case VAR:	Accept( VAR );
-		default: 	ParseExpression();
-
-	
-}
-
-PRIVATE void ParseWriteStatement( void )
-{
-
-	Accept ( "WRITE" ); //TODO Accept(WRITE) I think check this	
-	Accept ( "(" );	
-	ParseExpression();	
-			
-	while (CurrentToken.code == ","){
-		Accept ( "," );	
-		ParseExpression();
-		}
-
-	Accept ( ")" );			
-
-}
-
-PRIVATE void ParseReadStatement( void )
-{
-
-	Accept ( "READ" );	//TODO: Accept (READ) maybe
-	Accept ( "(" );	
-	ParseDeclaration();	
-			
-	while (CurrentToken.code == ","){
-		Accept ( "," );	
-		ParseExpression();
-		}
-
-	Accept ( ")" );			
-
-}
-
-
-
-PRIVATE void ParseAssignment( void )
-{
-	//TODO: Check paramters in accept routine here also
-	if (CurrentToken.code == "="){
-		Accept ( "=" );			
-		}
-
-	ParseExpression();
+		
 
 }
 
@@ -454,40 +453,22 @@ PRIVATE void ParseTerm( void )
 }
 
 
-PRIVATE void ParseCompoundTerm( void )
+PRIVATE void ParseBooleanExpression( void )
 {
+	
+	ParseExpression();
+	//TODO: REPLACE ALL OF THESE WITH PARAMETERS DEFINED AND USED BY THE ACCEPT FUNCTION
+	switch (CurrentToken){
+		case '=':	Accept( "=" );
+		case '<=':  	Accept( "<=" );
+		case '>=':	Accept( ">=" );
+		case '<':	Accept( "<" );
+		default: 	Accept ( ">" )
 
-	//Term Parse	
-
-	ParseTerm();
-
-	//MultOp Parse
-	//TODO REPLACE WITH PARAMETERS 
-	while ( CurrentToken.code == "*"  | CurrentToken.code == "/" ){
-		//TODO: CASE OR IF ELSE STATEMENT HERE TO HANDLE LOGIC CORRECTLY
-		Accept ( "/" );
-		Accept ( "*" );
-		ParseTerm();
-		}
-		
+	ParseExpression();
 
 }
 
-
-PRIVATE void ParseProcCallList( void )
-{
-
-	Accept ( "(" );	
-	ParseActualParameter();	
-			
-	while (CurrentToken.code == ","){
-		Accept ( "," );	
-		ParseActualParameter();	
-		}
-
-	Accept ( ")" );			
-
-}
 
 /*--------------------------------------------------------------------------*/
 /*                                                                          */

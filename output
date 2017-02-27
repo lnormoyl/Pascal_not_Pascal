@@ -8,10 +8,10 @@
   8 VAR y;
   9 BEGIN
  10     y := x + 234 * y;
-               ^
-Syntax: Expected Integer Constant, got +
+                       ^
+Syntax: Expected /, got Identifier
 
-               ^
+                       ^
 Parsing ends here in this program
 
  11 END;

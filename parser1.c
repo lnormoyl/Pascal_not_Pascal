@@ -181,7 +181,6 @@ PRIVATE void ParseDeclarations( void )
     Accept( SEMICOLON );
 }
 
-
 PRIVATE void ParseProcDeclaration( void )
 {
     Accept( PROCEDURE );
@@ -198,7 +197,7 @@ PRIVATE void ParseProcDeclaration( void )
 PRIVATE void ParseParameterList( void )
 {
     Accept( LEFTPARENTHESIS );
-	ParseFormalParameter();
+    ParseFormalParameter();
     while ( CurrentToken.code == COMMA ) ParseFormalParameter();
     Accept( RIGHTPARENTHESIS );
 }
@@ -207,7 +206,7 @@ PRIVATE void ParseParameterList( void )
 PRIVATE void ParseFormalParameter( void )
 {
  
-	if ( CurrentToken.code == REF )  Accept( REF);
+  if ( CurrentToken.code == REF )  Accept( REF);
 	Accept ( IDENTIFIER );
 }
 
@@ -396,9 +395,9 @@ PRIVATE void ParseWriteStatement( void )
 
 PRIVATE void ParseExpression( void )
 {
-	printf("here 0!\n");
+	printf("here ParseCompound term  start!\n");
 	ParseCompoundTerm();
-	printf("here 1!\n");
+	printf("here ParseCompoundTermEnd!\n");
 	while ( (CurrentToken.code == ADD) || (CurrentToken.code == SUBTRACT)  )  {
 		printf("here 2!\n");
 		Accept( CurrentToken.code );
@@ -435,19 +434,20 @@ PRIVATE void ParseTerm( void )
 
 	/*Term Parse*/	
 
-	if (CurrentToken.code == SUBTRACT) Accept ( SUBTRACT );			
-	
-		printf("here 2!\n");
+	if (CurrentToken.code == SUBTRACT) Accept ( SUBTRACT );	
 		/*SubTerm Parse*/
+
+	
 		switch (CurrentToken.code)
 			{
-			case IDENTIFIER:	Accept ( IDENTIFIER );
-			case INTCONST:  	Accept ( INTCONST ); 
-			default:	{
-						Accept ( LEFTPARENTHESIS );
-	      	  			ParseExpression();
-						Accept ( RIGHTPARENTHESIS );
-						}
+			case IDENTIFIER: { Accept ( IDENTIFIER ); break; }
+			case INTCONST: 	 { Accept ( INTCONST ); break;   } 
+			default:	 {
+					 Accept ( LEFTPARENTHESIS );
+	      	  			 ParseExpression();
+					 Accept ( RIGHTPARENTHESIS );
+					 break;
+					 }
 			}
 	
 }

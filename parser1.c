@@ -64,7 +64,6 @@ PRIVATE TOKEN  CurrentToken;       /*  Parser lookahead token.  Updated by  */
 /*                                                                          */
 /*--------------------------------------------------------------------------*/
 
-//TODO: Arrange function declarations and body declarations according to the grammar.pdf
 
 PRIVATE int  OpenFiles( int argc, char *argv[] );
 
@@ -198,17 +197,17 @@ PRIVATE void ParseProcDeclaration( void )
 
 PRIVATE void ParseParameterList( void )
 {
-    	Accept( "(" );
+    	Accept( LEFTPARENTHESIS );
 	ParseFormalParameter();
     	while ( CurrentToken.code == COMMA ) ParseFormalParameter();
-    	Accept( ")" );
+    	Accept( RIGHTPARENTHESIS );
 }
 
 
 PRIVATE void ParseFormalParameter( void )
 {
  
-	if ( CurrentToken.code == "REF" )  Accept( "REF");
+	if ( CurrentToken.code == REF )  Accept( REF);
 	Accept ( VAR );
 }
 
@@ -216,15 +215,15 @@ PRIVATE void ParseFormalParameter( void )
 PRIVATE void ParseBlock( void )
 {
 	
-	Accept( "BEGIN" );
-	//TODO: Replace with parameters
+	Accept( BEGIN );
+
 	
-	while ( //TODO: Something else here )  {	
+	while ( CurrentToken.code != END)  {	
 		ParseStatement();
-		Accept( ";" );	
+		Accept( SEMICOLON );	
 	}
 	
-	Accept( "END" );
+	Accept( END );
 
 }
 
@@ -283,18 +282,18 @@ PRIVATE void ParseRestOfStatement( void )
 
 PRIVATE void ParseProcCallList( void )
 {
-    	Accept( "(" );
+    	Accept( LEFTPARENTHESIS );
 	ParseActualParameter();
     	while ( CurrentToken.code == COMMA ) ParseActualParameter();
-    	Accept( ")" );
+    	Accept( RIGHTPARENTHESIS );
 }
 
 
 PRIVATE void ParseAssignment( void )
 {
-	//TODO: Check paramters in accept routine here also
-	if (CurrentToken.code == "="){
-		Accept ( "=" );			
+
+	if (CurrentToken.code == EQUALITY){
+		Accept ( EQUALITY );			
 		}
 
 	ParseExpression();
@@ -315,10 +314,10 @@ PRIVATE void ParseActualParameter( void )
 
 PRIVATE void ParseWhileStatement( void )
 {
-	//TODO Replace with parameters 
-	Accept ( "WHILE" );	
+
+	Accept ( WHILE );	
 	ParseBooleanExpression();
-	Accept ( "DO" );
+	Accept ( DO );
 	ParseBlock();
 	
 }
@@ -327,13 +326,13 @@ PRIVATE void ParseWhileStatement( void )
 PRIVATE void ParseIfStatement( void )
 {
 
-	Accept ( "IF" );	
+	Accept ( IF );	
 	ParseBooleanExpression();
-	Accept ( "THEN" );
+	Accept ( THEN );
 	ParseBlock();
-	//TODO: Replace with PARAMETERS, (check what it is)
-	if (CurrentToken.code == "ELSE"){
-		Accept ( "ELSE" );	
+
+	if (CurrentToken.code == ELSE){
+		Accept ( ELSE );	
 		ParseBlock();
 		}
 }
@@ -342,16 +341,16 @@ PRIVATE void ParseIfStatement( void )
 PRIVATE void ParseReadStatement( void )
 {
 
-	Accept ( "READ" );	//TODO: Accept (READ) maybe
-	Accept ( "(" );	
+	Accept ( READ );	
+	Accept ( LEFTPARENTHESIS );	
 	ParseDeclaration();	
 			
-	while (CurrentToken.code == ","){
-		Accept ( "," );	
+	while (CurrentToken.code == COMMA){
+		Accept ( COMMA );	
 		ParseExpression();
 		}
 
-	Accept ( ")" );			
+	Accept ( RIGHTPARENTHESIS );			
 
 }
 
@@ -359,16 +358,16 @@ PRIVATE void ParseReadStatement( void )
 PRIVATE void ParseWriteStatement( void )
 {
 
-	Accept ( "WRITE" ); //TODO Accept(WRITE) I think check this	
-	Accept ( "(" );	
+	Accept ( WRITE );
+	Accept ( LEFTPARENTHESIS );	
 	ParseExpression();	
 			
-	while (CurrentToken.code == ","){
-		Accept ( "," );	
+	while (CurrentToken.code == COMMA){
+		Accept ( COMMA );	
 		ParseExpression();
 		}
 
-	Accept ( ")" );			
+	Accept ( RIGHTPARENTHESIS );			
 
 }
 
@@ -397,10 +396,10 @@ PRIVATE void ParseExpression( void )
 {
 	
 	ParseCompoundTerm();
-	//TODO: SAME AS PROBLEM BELOW
-	while ( CurrentToken.code == "+" | CurrentToken.code == "-"  )  {
-		Accept( "+" );
-		Accept( "-" );
+
+	while ( CurrentToken.code == ADD | CurrentToken.code == SUBTRACT  )  {
+		Accept( ADD );
+		Accept( SUBTRACT );
 		ParseCompoundTerm();
 	}
 
@@ -417,11 +416,11 @@ PRIVATE void ParseCompoundTerm( void )
 	ParseTerm();
 
 	//MultOp Parse
-	//TODO REPLACE WITH PARAMETERS 
-	while ( CurrentToken.code == "*"  | CurrentToken.code == "/" ){
+
+	while ( CurrentToken.code == MULTIPLY  | CurrentToken.code == DIVIDE ){
 		//TODO: CASE OR IF ELSE STATEMENT HERE TO HANDLE LOGIC CORRECTLY
-		Accept ( "/" );
-		Accept ( "*" );
+		Accept ( MULTIPLY );
+		Accept ( DIVIDE );
 		ParseTerm();
 		}
 		
@@ -433,9 +432,9 @@ PRIVATE void ParseTerm( void )
 {
 
 	//Term Parse	
-	//TODO: Replace with #Defines instead of explicit chars
-	if (CurrentToken.code == "-"){
-		Accept ( "-" );			
+
+	if (CurrentToken.code == SUBTRACT){
+		Accept ( SUBTRACT );			
 		}
 
 		//SubTerm Parse
@@ -445,9 +444,9 @@ PRIVATE void ParseTerm( void )
 			case VAR:	ParseDeclarations();
 			case INTCONST:  Accept ( INTCONST ); 	//May need to handle parsing INTCONST later
 			default: {
-				Accept ( "(" )
+				Accept ( LEFTPARENTHESIS )
 	      	  		ParseExpression();
-				Accept ( ")" );
+				Accept ( RIGHTPARENTHESIS );
 				}
 	
 }
@@ -457,13 +456,13 @@ PRIVATE void ParseBooleanExpression( void )
 {
 	
 	ParseExpression();
-	//TODO: REPLACE ALL OF THESE WITH PARAMETERS DEFINED AND USED BY THE ACCEPT FUNCTION
+
 	switch (CurrentToken){
-		case '=':	Accept( "=" );
-		case '<=':  	Accept( "<=" );
-		case '>=':	Accept( ">=" );
-		case '<':	Accept( "<" );
-		default: 	Accept ( ">" )
+		case EQUALITY		:	Accept( EQUALITY );
+		case LESSEQUAL		:  	Accept( LESSEQUAL );
+		case GREATEREQUAL	:	Accept( GREATEREQUAL );
+		case LESS		:	Accept( LESS );
+		default			: 	Accept ( GREATER )
 
 	ParseExpression();
 

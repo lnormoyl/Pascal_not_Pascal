@@ -253,7 +253,10 @@ PRIVATE void ParseStatement( void )
 		case WHILE:		ParseWhileStatement();
 		case IF:		ParseIfStatement();
 		case READ:		ParseReadStatement();
-		default:		ParseSimpleStatement();
+		default:		{
+					ParseSimpleStatement();
+					break;
+					}
 		}
 
 
@@ -274,7 +277,10 @@ PRIVATE void ParseRestOfStatement( void )
 		{
 		case LEFTPARENTHESIS:	ParseProcCallList();
 		case ASSIGNMENT:	ParseAssignment();
-		default:		Accept( ENDOFINPUT );
+		default:		{
+					Accept( ENDOFINPUT );
+					break;
+					}
 		}
 }
 
@@ -307,7 +313,10 @@ PRIVATE void ParseActualParameter( void )
 	switch (CurrentToken.code)
 		{
 		case VAR:	Accept( VAR );
-		default: 	ParseExpression();
+		default: 	{
+				ParseExpression();
+				break;
+				}
 		}
 	
 }
@@ -459,11 +468,14 @@ PRIVATE void ParseBooleanExpression( void )
 	ParseExpression();
 
 	switch (CurrentToken.code){
-		case EQUALITY		:	Accept( EQUALITY );
-		case LESSEQUAL		:  	Accept( LESSEQUAL );
-		case GREATEREQUAL	:	Accept( GREATEREQUAL );
-		case LESS			:	Accept( LESS );
-		default				: 	Accept ( GREATER );
+		case EQUALITY:		Accept( EQUALITY );
+		case LESSEQUAL:  	Accept( LESSEQUAL );
+		case GREATEREQUAL:	Accept( GREATEREQUAL );
+		case LESS:		Accept( LESS );
+		default: 		{
+					Accept ( GREATER );
+					break;
+					}		
 		}
 
 	ParseExpression();

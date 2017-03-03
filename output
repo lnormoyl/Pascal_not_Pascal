@@ -1,21 +1,21 @@
   1 !
-  2 !               Test Program
+  2 !               Test Program with errors
   3 !
   4 PROGRAM test;
   5 VAR x, y;
   6 
   7 PROCEDURE muck ( REF x );
-  8 VAR y;
-  9 BEGIN
- 10     y := x + 234 * y;
-                       ^
-Syntax: Expected /, got Identifier
+  8 y;              ! VAR omitted
+    ^
+Syntax: Expected BEGIN, got Identifier
 
-                       ^
+    ^
 Parsing ends here in this program
 
- 11 END;
+  9 BEGIN
+ 10     y := x + 234 * y;
+ 11 ;               ! END omitted
  12 
  13 BEGIN           ! main program starts here
  14     muck( x );
- 15 END.
+ 15 END             ! missing '.'

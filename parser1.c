@@ -6,33 +6,8 @@
 /*       Group Members:          ID numbers                                 */
 /*                                                                          */
 /*           Aaron Moloney       14174014                                   */
-/*           Liam Normoyle       23456789                                   */
+/*           Liam Normoyle       14177994                                   */
 /*                                                                          */
-/*                                                                          */
-/*       Currently just a copy of "smallparser.c".  To create "parser1.c",  */
-/*       modify this source to reflect the CPL grammar.                     */
-/*                                                                          */
-/*--------------------------------------------------------------------------*/
-/*                                                                          */
-/*       smallparser                                                        */
-/*                                                                          */
-/*       An illustration of the use of the character handler and scanner    */
-/*       in a parser for the language                                       */
-/*                                                                          */
-/*       <Program>     :== "BEGIN" { <Statement> ";" } "END" "."            */
-/*       <Statement>   :== <Identifier> ":=" <Expression>                   */
-/*       <Expression>  :== <Identifier> | <IntConst>                        */
-/*                                                                          */
-/*                                                                          */
-/*       Note - <Identifier> and <IntConst> are provided by the scanner     */
-/*       as tokens IDENTIFIER and INTCONST respectively.                    */
-/*                                                                          */
-/*       Although the listing file generator has to be initialised in       */
-/*       this program, full listing files cannot be generated in the        */
-/*       presence of errors because of the "crash and burn" error-          */
-/*       handling policy adopted. Only the first error is reported, the     */
-/*       remainder of the input is simply copied to the output (using       */
-/*       the routine "ReadToEndOfFile") without further comment.            */
 /*                                                                          */
 /*--------------------------------------------------------------------------*/
 
@@ -144,9 +119,12 @@ PRIVATE void ParseProgram( void )
     Accept( PROGRAM );
     Accept( IDENTIFIER );
     Accept( SEMICOLON );
-    ParseDeclarations();
-    if ( CurrentToken.code == VAR )  ParseDeclarations();
-    while ( CurrentToken.code == PROCEDURE )  ParseProcDeclaration();
+    ParseDeclarations();    
+    if ( CurrentToken.code == VAR )  ParseDeclarations();   
+    while ( CurrentToken.code == PROCEDURE )
+      {	
+	ParseProcDeclaration();	
+      }
     ParseBlock();
     Accept( ENDOFPROGRAM );
 }
@@ -207,7 +185,7 @@ PRIVATE void ParseFormalParameter( void )
 {
  
   if ( CurrentToken.code == REF )  Accept( REF);
-	Accept ( IDENTIFIER );
+  Accept ( IDENTIFIER );
 }
 
 
@@ -217,9 +195,10 @@ PRIVATE void ParseBlock( void )
 	Accept( BEGIN );
 
 	
-	while ( CurrentToken.code != END)  {	
-		ParseStatement();
-		Accept( SEMICOLON );	
+	while ( CurrentToken.code != END)
+	{	
+	  ParseStatement();
+	  Accept( SEMICOLON );	
 	}
 	
 	Accept( END );
@@ -249,14 +228,11 @@ PRIVATE void ParseStatement( void )
 	
 	switch (CurrentToken.code)
 		{
-		case WRITE:		ParseWriteStatement();
-		case WHILE:		ParseWhileStatement();
-		case IF:		ParseIfStatement();
-		case READ:		ParseReadStatement();
-		default:		{
-					ParseSimpleStatement();
-					break;
-					}
+		case WRITE:		ParseWriteStatement(); break;
+		case WHILE:		ParseWhileStatement(); break;
+		case IF:		ParseIfStatement(); break;
+		case READ:		ParseReadStatement(); break;
+		default:		ParseSimpleStatement();	break;
 		}
 
 
@@ -275,12 +251,9 @@ PRIVATE void ParseRestOfStatement( void )
 
 	switch (CurrentToken.code)
 		{
-		case LEFTPARENTHESIS:	ParseProcCallList();
-		case ASSIGNMENT:	ParseAssignment();
-		default:		{
-					Accept( ENDOFINPUT );
-					break;
-					}
+		case LEFTPARENTHESIS:	ParseProcCallList(); break;
+		case ASSIGNMENT:	ParseAssignment(); break;
+		default:		Accept( ENDOFINPUT ); break;
 		}
 }
 
@@ -298,9 +271,10 @@ PRIVATE void ParseProcCallList( void )
 PRIVATE void ParseAssignment( void )
 {
 	
-	if (CurrentToken.code == ASSIGNMENT){
-		Accept ( ASSIGNMENT );			
-		}
+	if (CurrentToken.code == ASSIGNMENT)
+	{
+	  Accept ( ASSIGNMENT );			
+	}
 
 	ParseExpression();
 
@@ -312,11 +286,8 @@ PRIVATE void ParseActualParameter( void )
 
 	switch (CurrentToken.code)
 		{
-		case VAR:	Accept( VAR );
-		default: 	{
-				ParseExpression();
-				break;
-				}
+		case VAR:	Accept( VAR ); break;
+		default: 	ParseExpression(); break;
 		}
 	
 }
@@ -404,11 +375,9 @@ PRIVATE void ParseWriteStatement( void )
 
 PRIVATE void ParseExpression( void )
 {
-	printf("here ParseCompound term  start!\n");
 	ParseCompoundTerm();
-	printf("here ParseCompoundTermEnd!\n");
-	while ( (CurrentToken.code == ADD) || (CurrentToken.code == SUBTRACT)  )  {
-		printf("here 2!\n");
+	while ( (CurrentToken.code == ADD) || (CurrentToken.code == SUBTRACT)  )
+	{
 		Accept( CurrentToken.code );
 		ParseCompoundTerm();
 	}
@@ -427,13 +396,14 @@ PRIVATE void ParseCompoundTerm( void )
 
 	/*MultOp Parse*/
 
-	while ( (CurrentToken.code == MULTIPLY)  | (CurrentToken.code == DIVIDE) ){
-		/*TODO: CASE OR IF ELSE STATEMENT HERE TO HANDLE LOGIC CORRECTLY*/
-		Accept ( MULTIPLY );
-		Accept ( DIVIDE );
+	while ( (CurrentToken.code == MULTIPLY)  || (CurrentToken.code == DIVIDE) )
+	  {
+	    if(CurrentToken.code == MULTIPLY || CurrentToken.code == DIVIDE)
+	      {
+		Accept (CurrentToken.code);
 		ParseTerm();
-		}
-		
+	      }
+	  }	
 
 }
 

@@ -3,13 +3,13 @@
 
 ./parser1 tests/test1.prog output
 echo "Test 1 run"
-./parser1 tests/test2.errs output
+./parser1 tests/test2.prog output
 echo "Test 2 run"
-./parser1 tests/test3.errs output
+./parser1 tests/test3.prog output
 echo "Test 3 run"
-./parser1 tests/test4.errs output
+./parser1 tests/test4.prog output
 echo "Test 4 run"
-./parser1 tests/test5.errs output
+./parser1 tests/test5.prog output
 echo "Test 5 run"
-./parser1 tests/test6.errs output
+./parser1 tests/test6.prog output
 echo "Test 6 run"

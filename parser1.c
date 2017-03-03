@@ -253,6 +253,7 @@ PRIVATE void ParseRestOfStatement( void )
 		{
 		case LEFTPARENTHESIS:	ParseProcCallList(); break;
 		case ASSIGNMENT:	ParseAssignment(); break;
+		case SEMICOLON:         break;
 		default:		Accept( ENDOFINPUT ); break;
 		}
 }
@@ -324,12 +325,13 @@ PRIVATE void ParseReadStatement( void )
 
 	Accept ( READ );	
 	Accept ( LEFTPARENTHESIS );	
-	ParseDeclarations();	
+	Accept ( IDENTIFIER );	
 			
-	while (CurrentToken.code == COMMA){
-		Accept ( COMMA );	
-		ParseExpression();
-		}
+	while (CurrentToken.code == COMMA)
+	  {
+	    Accept ( COMMA );	
+	    Accept ( IDENTIFIER );
+	  }
 
 	Accept ( RIGHTPARENTHESIS );			
 
@@ -437,16 +439,14 @@ PRIVATE void ParseBooleanExpression( void )
 	
 	ParseExpression();
 
-	switch (CurrentToken.code){
-		case EQUALITY:		Accept( EQUALITY );
-		case LESSEQUAL:  	Accept( LESSEQUAL );
-		case GREATEREQUAL:	Accept( GREATEREQUAL );
-		case LESS:		Accept( LESS );
-		default: 		{
-					Accept ( GREATER );
-					break;
-					}		
-		}
+	switch (CurrentToken.code)
+	{
+	case EQUALITY:		Accept( EQUALITY ); break;
+	case LESSEQUAL:  	Accept( LESSEQUAL ); break;
+	case GREATEREQUAL:	Accept( GREATEREQUAL ); break;
+	case LESS:		Accept( LESS ); break;
+	default: 	Accept ( GREATER ); break;		
+	}
 
 	ParseExpression();
 
@@ -573,3 +573,4 @@ PRIVATE void ReadToEndOfFile( void )
         while ( CurrentToken.code != ENDOFINPUT )  CurrentToken = GetToken();
     }
 }
+

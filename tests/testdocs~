@@ -1,0 +1,39 @@
+TODO:
+-No declarations or single declaration.
+-Multiple formal params
+-Proc calls with multiple params
+-[Actual paramters]
+-Big expressions
+
+
+Test1:
+Checks
+-Comments
+-Var declaration
+-Proc declaration with params
+-Local var declaration
+-Inner block
+-Main block with proc call.
+
+Test2: (Duplicate checks omittied)
+Checks
+-Proc declaration without params
+-2x Expressions in block
+Main block with proc call
+
+Test3:
+Checks:
+Block with inner while and inner inner write
+
+Test4:
+Checks:
+-Read
+-While + boolean expr
+-inner if else inner write inner read
+
+Test5:
+Checks:
+-if statement
+
+Test6:
+Not much here.

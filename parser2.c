@@ -179,11 +179,12 @@ PRIVATE void ParseProcDeclaration( void )
     Synchronise( &ProcFS_aug, &ProcFBS); 
     if ( CurrentToken.code == VAR )  ParseDeclarations();
     Synchronise( &ProcFS_aug, &ProcFBS); 
-    while ( CurrentToken.code == PROCEDURE )  {
-    	ParseProcDeclaration();
-    	}
+    while ( CurrentToken.code == PROCEDURE )  
+   	{
+    		ParseProcDeclaration();    	
+	  	Synchronise( &ProcFS_aug, &ProcFBS); 
+	}
     ParseBlock();
-    Synchronise( &ProcFS_aug, &ProcFBS); 
     Accept( SEMICOLON );
 }
 

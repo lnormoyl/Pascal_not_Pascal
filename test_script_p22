@@ -1,0 +1,15 @@
+#! /bin/bash
+#Script to mass run tests
+
+./parser2 tests/test1.errs output
+echo "BadTest 1 run"
+./parser2 tests/test2.errs output
+echo "BadTest 2 run"
+./parser2 tests/test3.errs output
+echo "BadTest 3 run"
+./parser2 tests/test4.errs output
+echo "BadTest 4 run"
+./parser2 tests/test5.errs output
+echo "BadTest 5 run"
+./parser2 tests/test6.errs output
+echo "BadTest 6 run"

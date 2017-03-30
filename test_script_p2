@@ -1,0 +1,15 @@
+#! /bin/bash
+#Script to mass run tests
+
+./parser2 tests/test1.prog output
+echo "Test 1 run"
+./parser2 tests/test2.prog output
+echo "Test 2 run"
+./parser2 tests/test3.prog output
+echo "Test 3 run"
+./parser2 tests/test4.prog output
+echo "Test 4 run"
+./parser2 tests/test5.prog output
+echo "Test 5 run"
+./parser2 tests/test6.prog output
+echo "Test 6 run"

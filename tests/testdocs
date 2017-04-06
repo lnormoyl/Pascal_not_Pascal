@@ -1,12 +1,12 @@
 
 
 TODO:
--No declarations or single declaration.
--Multiple formal params
--Proc calls with multiple params
--[Actual paramters]
--Big expressions
--Early ENDOFFILES??
+-No declarations or single declaration. test7.prog
+-Multiple formal params test8
+-Proc calls with multiple params test8
+-[Actual paramters] test8
+-Big expressions test8
+-Early ENDOFFILES?? test9.errs
 -TODO: Check ending with nothing should look for endoffile
 
 

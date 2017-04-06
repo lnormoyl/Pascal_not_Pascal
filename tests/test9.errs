@@ -1,0 +1,5 @@
+PROGRAM test9;
+VAR  x, y
+PROCEDURE z( REF a );
+BEGIN;
+    a := x 

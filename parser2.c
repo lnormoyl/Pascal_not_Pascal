@@ -1,7 +1,7 @@
 /*--------------------------------------------------------------------------*/
 /*                                                                          */
-/*       parser1                                                            */
-/*                                                                          */
+/*       parser2 : Reports errors and tries to recover to keep parsing      */
+/*                 So it can catch as many errors                           */
 /*                                                                          */
 /*       Group Members:          ID numbers                                 */
 /*                                                                          */
@@ -32,6 +32,7 @@ PRIVATE TOKEN  CurrentToken;       /*  Parser lookahead token.  Updated by  */
                                    /*  routine Accept (below).  Must be     */
                                    /*  initialised before parser starts.    */
 
+/*First and follow sets for sync points in grammar */
 PRIVATE SET ProgramFS_aug;
 PRIVATE SET ProgramFBS;
 PRIVATE SET StatementFS_aug;
@@ -73,10 +74,6 @@ PRIVATE void Synchronise( SET *F, SET *FB );
 PRIVATE void SetupSets( void );
 
 
-
-
-
-
 /*--------------------------------------------------------------------------*/
 /*                                                                          */
 /*  Main: parser2 entry point.  Sets up parser globals (opens input and     */
@@ -108,8 +105,8 @@ PUBLIC int main ( int argc, char *argv[] )
 /*                                                                          */
 /*  ParseProgram implements:                                                */
 /*                                                                          */
-/*       Program :== “PROGRAM” <Identifier> “;”				    */
-/*	[ <Declarations> ] { <ProcDeclaration> } <Block> “.”		    */
+/*       Program :== “PROGRAM” <Identifier> “;”				                */
+/*	[ <Declarations> ] { <ProcDeclaration> } <Block> “.”		            */
 /*                                                                          */
 /*                                                                          */
 /*    Inputs:       None                                                    */
@@ -118,8 +115,8 @@ PUBLIC int main ( int argc, char *argv[] )
 /*                                                                          */
 /*    Returns:      Nothing                                                 */
 /*                                                                          */
-/*    Side Effects: Lookahead token advanced.                               */
-/*                                                                          */
+/*    Side Effects: Lookahead token advanced                                */
+/*                  Calls Syncronise function (see sideeffects              */
 /*--------------------------------------------------------------------------*/
 
 PRIVATE void ParseProgram( void )
@@ -128,14 +125,14 @@ PRIVATE void ParseProgram( void )
     Accept( PROGRAM );
     Accept( IDENTIFIER );
     Accept( SEMICOLON );
-    Synchronise( &ProgramFS_aug, &ProgramFBS); 
-    ParseDeclarations();    
+    /*Sync around the declarations (sync is for error detection & recovery) */
+    Synchronise( &ProgramFS_aug, &ProgramFBS);
     if ( CurrentToken.code == VAR )  ParseDeclarations();    /* check for declarations */  
     Synchronise( &ProgramFS_aug, &ProgramFBS);   
     while ( CurrentToken.code == PROCEDURE ) /*check for 1 or more proc declarations */
       { 
-    ParseProcDeclaration(); 
-    Synchronise( &ProgramFS_aug, &ProgramFBS); 
+        ParseProcDeclaration(); 
+        Synchronise( &ProgramFS_aug, &ProgramFBS);  /*Sync inside the loop  */
       }
     ParseBlock();
     Accept( ENDOFPROGRAM );
@@ -184,7 +181,8 @@ PRIVATE void ParseDeclarations( void )
 /*                                                                          */
 /*    Returns:      Nothing                                                 */
 /*                                                                          */
-/*    Side Effects: Lookahead token advanced.                               */
+/*    Side Effects: Lookahead token advanced                                */
+/*                  Calls Syncronise function (see side effects)            */
 /*                                                                          */
 /*--------------------------------------------------------------------------*/
 
@@ -199,7 +197,7 @@ PRIVATE void ParseProcDeclaration( void )
     Synchronise( &ProcFS_aug, &ProcFBS); 
     while ( CurrentToken.code == PROCEDURE )   /*check for nested proc declarations */
    	{
-    		ParseProcDeclaration();    	
+        ParseProcDeclaration();    	
 	  	Synchronise( &ProcFS_aug, &ProcFBS); 
 	}
     ParseBlock();
@@ -227,7 +225,12 @@ PRIVATE void ParseParameterList( void )
 {
     Accept( LEFTPARENTHESIS );
     ParseFormalParameter();
-    while ( CurrentToken.code == COMMA ) ParseFormalParameter(); /*check for 1 or more formal parameters */
+    while ( CurrentToken.code == COMMA ) /*check for 1 or more formal parameters */
+      {
+        Accept ( COMMA );
+        ParseFormalParameter();
+      }
+
     Accept( RIGHTPARENTHESIS );
 }
 
@@ -268,7 +271,8 @@ PRIVATE void ParseFormalParameter( void )
 /*                                                                          */
 /*    Returns:      Nothing                                                 */
 /*                                                                          */
-/*    Side Effects: Lookahead token advanced.                               */
+/*    Side Effects: Lookahead token advanced                                */
+/*                  Calls Syncronise function (see side effects)            */
 /*                                                                          */
 /*--------------------------------------------------------------------------*/
 
@@ -282,7 +286,7 @@ PRIVATE void ParseBlock( void )
     {   
       ParseStatement();
       Accept( SEMICOLON );  
-      Synchronise( &StatementFS_aug, &StatementFBS); 
+      Synchronise( &StatementFS_aug, &StatementFBS); /*Sync inside statements loop  */
     }
     
     Accept( END );
@@ -372,7 +376,7 @@ PRIVATE void ParseRestOfStatement( void )
         {
         case LEFTPARENTHESIS:   ParseProcCallList(); break;
         case ASSIGNMENT:    ParseAssignment(); break;
-        case SEMICOLON:         break;
+        case SEMICOLON:         break; /* 'nothing' so break and finish parse statement */
         default:        Accept( ENDOFINPUT ); break;
         }
 }
@@ -398,8 +402,12 @@ PRIVATE void ParseRestOfStatement( void )
 PRIVATE void ParseProcCallList( void )
 {
         Accept( LEFTPARENTHESIS );
-    ParseActualParameter();
-        while ( CurrentToken.code == COMMA ) ParseActualParameter();
+        ParseActualParameter();
+    	while ( CurrentToken.code == COMMA ) 
+          {
+            Accept ( COMMA ) ;
+            ParseActualParameter(); 
+          }
         Accept( RIGHTPARENTHESIS );
 }
 
@@ -579,10 +587,11 @@ PRIVATE void ParseWriteStatement( void )
     Accept ( LEFTPARENTHESIS ); 
     ParseExpression();  
             
-    while (CurrentToken.code == COMMA){
+    while (CurrentToken.code == COMMA)
+      {
         Accept ( COMMA );   
         ParseExpression();
-        }
+      }
 
     Accept ( RIGHTPARENTHESIS );            
 
@@ -651,10 +660,10 @@ PRIVATE void ParseCompoundTerm( void )
 
     while ( (CurrentToken.code == MULTIPLY)  || (CurrentToken.code == DIVIDE) )
       {
-        if(CurrentToken.code == MULTIPLY || CurrentToken.code == DIVIDE)
+        if ( CurrentToken.code == MULTIPLY || CurrentToken.code == DIVIDE)
           {
-        Accept (CurrentToken.code);
-        ParseTerm();
+            Accept (CurrentToken.code);
+            ParseTerm();
           }
       } 
 
@@ -748,12 +757,9 @@ PRIVATE void ParseBooleanExpression( void )
 /*           lookahead matches this, advances the lookahead and returns.    */
 /*                                                                          */
 /*           If the expected token fails to match the current lookahead,    */
-/*           this routine reports a syntax error and exits ("crash & burn"  */
-/*           parsing).  "SyntaxError" (from "scanner.h")                    */
-/*           puts the error message on the                                  */
-/*           standard output and on the listing file, and the helper        */
-/*           "ReadToEndOfFile" which just ensures that the listing file is  */
-/*           completely generated.                                          */
+/*           this routine reports a syntax error and attempts to recover    */
+/*           but puts the error message on the standard output              */
+/*           and on the listing file                                        */
 /*                                                                          */
 /*                                                                          */
 /*    Inputs:       Integer code of expected token                          */
@@ -763,8 +769,9 @@ PRIVATE void ParseBooleanExpression( void )
 /*    Returns:      Nothing                                                 */
 /*                                                                          */
 /*    Side Effects: If successful, advances the current lookahead token     */
-/*                  "CurrentToken".                                         */
-/*                                                                          */
+/*                  "CurrentToken". Otherwise will continue to advance      */
+/*                  The lookahead to attempt to resync                      */
+/*                  Will exit program if it sees endofinput                 */
 /*--------------------------------------------------------------------------*/
 
 PRIVATE void Accept( int ExpectedToken )
@@ -772,7 +779,7 @@ PRIVATE void Accept( int ExpectedToken )
     static int recovering = 0;
 
      
-     if ( CurrentToken.code == ENDOFINPUT)
+    if ( CurrentToken.code == ENDOFINPUT) /* Short circuit/exit  if we reach the end of the input program */
      {    
          if (ExpectedToken == ENDOFINPUT) 
          {
@@ -793,19 +800,19 @@ PRIVATE void Accept( int ExpectedToken )
     {
         while ( CurrentToken.code != ExpectedToken && CurrentToken.code != ENDOFINPUT)
         { 
-            CurrentToken = GetToken();
+          CurrentToken = GetToken(); /*If we are recovering advance until we get something we expect */
         } 
         recovering = 0;
     }
 
     if ( CurrentToken.code != ExpectedToken )  
     {
-        SyntaxError( ExpectedToken, CurrentToken );
-        recovering = 1;
+      SyntaxError( ExpectedToken, CurrentToken ); /*Print syntax error and start recovering */
+      recovering = 1;
     }
     else  
     {
-        CurrentToken = GetToken();
+      CurrentToken = GetToken(); /* Everything OK continue as normal */
     }
 }
 
@@ -836,7 +843,7 @@ PRIVATE void Synchronise( SET *F, SET *FB )
     if ( !InSet( F, CurrentToken.code ) ) 
     {
 		SyntaxError2( *F, CurrentToken );
-		while ( !InSet( &S, CurrentToken.code ) )
+		while ( !InSet( &S, CurrentToken.code ) ) /*If currenttoken not expected advance look ahead */
 		{
 		CurrentToken = GetToken();
 		}
@@ -846,9 +853,9 @@ PRIVATE void Synchronise( SET *F, SET *FB )
 /*--------------------------------------------------------------------------*/
 /*                                                                          */
 /*  SetupSets  :  Initialise the first and follow sets for                  */
-/*	 	  "sync" points in the parser for error recovery            */
+/*	 	          "sync" points in the parser for error recovery            */
 /*                Currently sets for Statement,Program and ProcDeclartion   */
-/*    Inputs:       None				                    */
+/*    Inputs:       None				                                    */
 /*    Outputs:      None                                                    */
 /*                                                                          */
 /*    Returns:      Nothing                                                 */
@@ -864,13 +871,7 @@ PRIVATE void SetupSets( void )
     InitSet ( &ProgramFBS,1,ENDOFINPUT );
     InitSet ( &ProcFS_aug,3,BEGIN,PROCEDURE,VAR);
     InitSet ( &ProcFBS,2, BEGIN,ENDOFINPUT);
-    /*OPTIONAL TODO: Secondary sync 
-    Declarations inner loop
-    ProcDeclarations parameterlist inner loop
-    Parameter list formal parameter inner loop
-    Formal Parameter
-    Proc call list actual parameter inner loop
-    */    
+    /*Primary sync points above, secondary not implemented */
 } 
 
 

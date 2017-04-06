@@ -85,7 +85,8 @@ PUBLIC int main ( int argc, char *argv[] )
         CurrentToken = GetToken(); /*start with first token */
         ParseProgram();
         fclose( InputFile );
-        fclose( ListFile );
+        fclose( ListFile );        
+        printf("valid\n");
         return  EXIT_SUCCESS;
     }
     else 
@@ -101,9 +102,9 @@ PUBLIC int main ( int argc, char *argv[] )
 /*                                                                          */
 /*  ParseProgram implements:                                                */
 /*                                                                          */
-/*       Program :== “PROGRAM” <Identifier> “;”				    */
-/*	[ <Declarations> ] { <ProcDeclaration> } <Block> “.”		    */
-/*            								    */
+/*       Program :== “PROGRAM” <Identifier> “;”				                */
+/*	[ <Declarations> ] { <ProcDeclaration> } <Block> “.”		            */
+/*            								                                */
 /*                                                                          */
 /*                                                                          */
 /*    Inputs:       None                                                    */
@@ -121,11 +122,10 @@ PRIVATE void ParseProgram( void )
     Accept( PROGRAM );
     Accept( IDENTIFIER );
     Accept( SEMICOLON );
-    ParseDeclarations();    
     if ( CurrentToken.code == VAR )  ParseDeclarations();   /* check for declarations */
     while ( CurrentToken.code == PROCEDURE ) /*check for 1 or more proc declarations */
       {	
-	ParseProcDeclaration();	
+        ParseProcDeclaration();	
       }
     ParseBlock();
     Accept( ENDOFPROGRAM );
@@ -154,10 +154,11 @@ PRIVATE void ParseDeclarations( void )
 {
     Accept( VAR );
     Accept( IDENTIFIER );
-    while ( CurrentToken.code == COMMA )  { /*Check for 1 or more additional declarations */
+    while ( CurrentToken.code == COMMA ) /*Check for 1 or more additional declarations */
+      { 
         Accept( COMMA );
         Accept( IDENTIFIER );
-    }
+      }
     Accept( SEMICOLON );
 }
 
@@ -211,7 +212,11 @@ PRIVATE void ParseParameterList( void )
 {
     Accept( LEFTPARENTHESIS );
     ParseFormalParameter();
-    while ( CurrentToken.code == COMMA ) ParseFormalParameter(); /*check for 1 or more formal parameters */
+    while ( CurrentToken.code == COMMA ) /*check for 1 or more formal parameters */
+      {
+        Accept ( COMMA );
+        ParseFormalParameter();
+      }
     Accept( RIGHTPARENTHESIS );
 }
 
@@ -265,7 +270,7 @@ PRIVATE void ParseBlock( void )
 	while ( CurrentToken.code != END) /*Check for 1 or more statements */
 	{	
 	  ParseStatement();
-	  Accept( SEMICOLON );	
+	  Accept( SEMICOLON );
 	}
 	
 	Accept( END );
@@ -301,7 +306,6 @@ PRIVATE void ParseStatement( void )
 		case READ:		ParseReadStatement(); break;
 		default:		ParseSimpleStatement();	break;
 		}
-
 
 }
 
@@ -352,7 +356,7 @@ PRIVATE void ParseRestOfStatement( void )
 		{
 		case LEFTPARENTHESIS:	ParseProcCallList(); break;
 		case ASSIGNMENT:	ParseAssignment(); break;
-		case SEMICOLON:         break;
+		case SEMICOLON:         break; /* 'nothing' so break and finish parse statement */
 		default:		Accept( ENDOFINPUT ); break;
 		}
 }
@@ -378,7 +382,11 @@ PRIVATE void ParseProcCallList( void )
 {
     	Accept( LEFTPARENTHESIS );
 	ParseActualParameter();
-    	while ( CurrentToken.code == COMMA ) ParseActualParameter(); /* check for two or more actual parameters */
+    	while ( CurrentToken.code == COMMA ) 
+          {
+            Accept ( COMMA ) ;
+            ParseActualParameter(); 
+          }
     	Accept( RIGHTPARENTHESIS );
 }
 
@@ -401,7 +409,7 @@ PRIVATE void ParseProcCallList( void )
 
 PRIVATE void ParseAssignment( void )
 {
-	/*TODO:  TEST THIS */
+  
 	Accept ( ASSIGNMENT );	
 	ParseExpression();
 
@@ -492,6 +500,7 @@ PRIVATE void ParseIfStatement( void )
 		Accept ( ELSE );	
 		ParseBlock();
 	}
+    
 }
 
 /*--------------------------------------------------------------------------*/
@@ -739,10 +748,11 @@ PRIVATE void ParseBooleanExpression( void )
 PRIVATE void Accept( int ExpectedToken )
 {
     if ( CurrentToken.code != ExpectedToken )  {
-        SyntaxError( ExpectedToken, CurrentToken );
+      /*SyntaxError( ExpectedToken, CurrentToken ); assignment stated to just print "syntax error" on any error */ 
         ReadToEndOfFile();
         fclose( InputFile );
         fclose( ListFile );
+        printf(" syntax error\n");
         exit( EXIT_FAILURE );
     }
     else  CurrentToken = GetToken();
@@ -822,9 +832,10 @@ PRIVATE int  OpenFiles( int argc, char *argv[] )
 
 PRIVATE void ReadToEndOfFile( void )
 {
-    if ( CurrentToken.code != ENDOFINPUT )  {
-        Error( "Parsing ends here in this program\n", CurrentToken.pos );
-        while ( CurrentToken.code != ENDOFINPUT )  CurrentToken = GetToken();
+  if ( CurrentToken.code != ENDOFINPUT )
+    {
+      /* Error( "Parsing ends here in this program\n", CurrentToken.pos ); assignment stated to just print "syntax error" on failure */
+      while ( CurrentToken.code != ENDOFINPUT )  CurrentToken = GetToken();
     }
 }
 

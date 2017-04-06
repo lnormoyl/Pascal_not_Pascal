@@ -1,0 +1,12 @@
+PROGRAM test;
+VAR x;
+
+PROCEDURE muck ( REF x );
+VAR y;
+BEGIN
+    y := x + 234/5;
+END;
+
+BEGIN           ! main program starts here
+    muck( x );
+END.

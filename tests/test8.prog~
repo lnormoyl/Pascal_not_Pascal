@@ -1,0 +1,12 @@
+PROGRAM test8;
+VAR x,y,a;
+
+PROCEDURE muck ( REF x , REF y , REF a , b , c , d );
+VAR y;
+BEGIN
+    y := x + 234 * y + a/5;
+END;
+
+BEGIN           ! main program starts here
+    muck( x,y,a,2,3,4 );
+END.

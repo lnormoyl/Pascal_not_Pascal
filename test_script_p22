@@ -1,15 +1,25 @@
 #! /bin/bash
 #Script to mass run tests
 
+
+echo "ErrTest 1 run"
 ./parser2 tests/test1.errs output
-echo "BadTest 1 run"
+echo "ErrTest 2 run"
 ./parser2 tests/test2.errs output
-echo "BadTest 2 run"
+echo "ErrTest 3 run"
 ./parser2 tests/test3.errs output
-echo "BadTest 3 run"
+echo "ErrTest 4 run"
 ./parser2 tests/test4.errs output
-echo "BadTest 4 run"
+echo "ErrTest 5 run"
 ./parser2 tests/test5.errs output
-echo "BadTest 5 run"
+echo "ErrTest 6 run"
 ./parser2 tests/test6.errs output
-echo "BadTest 6 run"
+echo "ErrTest 7 run"
+
+./parser2 tests/test7.errs output
+echo "ErrTest 8 run"
+
+./parser2 tests/test8.errs output
+echo "ErrTest 9 run"
+
+./parser2 tests/test9.errs output

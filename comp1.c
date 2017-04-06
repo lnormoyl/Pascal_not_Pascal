@@ -1,12 +1,12 @@
 /*--------------------------------------------------------------------------*/
 /*                                                                          */
-/*       parser1                                                            */
+/*       comp1                                                              */
 /*                                                                          */
 /*                                                                          */
-/*       Group Members:          ID numbers                                 */
+/*       Group Members:      ID numbers                                     */
 /*                                                                          */
-/*           Aaron Moloney       14174014                                   */
-/*           Liam Normoyle       14177994                                   */
+/*       Aaron Moloney       14174014                                       */
+/*       Liam Normoyle       14177994                                       */
 /*                                                                          */
 /*                                                                          */
 /*--------------------------------------------------------------------------*/
@@ -32,8 +32,8 @@ PRIVATE FILE *ListFile;            /*  For nicely-formatted syntax errors.  */
 PRIVATE FILE *CodeFile;
 
 PRIVATE TOKEN  CurrentToken;       /*  Parser lookahead token.  Updated by  */
-			       /*  routine Accept (below).  Must be     */
-			       /*  initialised before parser starts.    */
+                                   /*  routine Accept (below).  Must be     */
+			                       /*  initialised before parser starts.    */
 PRIVATE int scope=0; /*global scope variable for semantic parsing */
 PRIVATE int varaddress=0;  /*global address variable for assigning globals next to each other*/
 
@@ -82,12 +82,11 @@ PRIVATE void SetupSets( void );
 PRIVATE void MakeSymbolTableEntry( int symtype );
 PRIVATE SYMBOL *LookupSymbol( void );
 
-/*precendence and operation instruction table initialisation */
 
 
 /*--------------------------------------------------------------------------*/
 /*                                                                          */
-/*  Main: Smallparser entry point.  Sets up parser globals (opens input and */
+/*  Main: Comp1 entry point.  Sets up parser globals (opens input and */
 /*        output files, initialises current lookahead), then calls          */
 /*        "ParseProgram" to start the parse.                                */
 /*                                                                          */
@@ -138,7 +137,6 @@ PRIVATE void ParseProgram( void )
     Accept( IDENTIFIER );
     Accept( SEMICOLON );
     Synchronise( &ProgramFS_aug, &ProgramFBS); 
-    ParseDeclarations();    
     if ( CurrentToken.code == VAR )  ParseDeclarations();     
     Synchronise( &ProgramFS_aug, &ProgramFBS);   
     while ( CurrentToken.code == PROCEDURE )
@@ -209,7 +207,11 @@ PRIVATE void ParseParameterList( void )
 {
     Accept( LEFTPARENTHESIS );
     ParseFormalParameter();
-    while ( CurrentToken.code == COMMA ) ParseFormalParameter();
+    while ( CurrentToken.code == COMMA ) /*check for 1 or more formal parameters */
+      {
+        Accept ( COMMA );
+        ParseFormalParameter();
+      }
     Accept( RIGHTPARENTHESIS );
 }
 
@@ -338,7 +340,11 @@ PRIVATE void ParseProcCallList( SYMBOL *target )
 {
     Accept( LEFTPARENTHESIS );
     ParseActualParameter();
-    while ( CurrentToken.code == COMMA ) ParseActualParameter();
+    while ( CurrentToken.code == COMMA ) /*check for 1 or more formal parameters */
+      {
+        Accept ( COMMA );
+        ParseFormalParameter();
+      }
     Accept( RIGHTPARENTHESIS );
 }
 

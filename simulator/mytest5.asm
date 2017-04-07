@@ -1,12 +1,16 @@
   0  Inc   2   
   1  Read
-  2  Load  0   
-  3  Load  1   
-  4  Sub
-  5  Blz   11  
-  6  Write
-  7  Load  0   
-  8  Load  1   
-  9  Load  #1   
- 10  Br    0   
- 11  Halt
+  2  Store 0   
+  3  Read
+  4  Store 1   
+  5  Load  0   
+  6  Load  1   
+  7  Sub
+  8  Blz   15  
+  9  Load  0   
+ 10  Write
+ 11  Load  1   
+ 12  Write
+ 13  Load  #1   
+ 14  Write
+ 15  Halt

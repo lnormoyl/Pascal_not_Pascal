@@ -580,15 +580,14 @@ PRIVATE void ParseWhileStatement( void )
 PRIVATE void ParseIfStatement( void )
 {
         int Label1,Label2,L1BackPatchLoc,L2BackPatchLoc;
-        Accept ( IF );
+        Accept ( IF );        
         L1BackPatchLoc = ParseBooleanExpression(); /*Don't know where we branch to yet*/
-        Accept ( THEN );    
+        Accept ( THEN );        
         ParseBlock();
-        Emit (I_BR,0); /*Backpatch later */
-        L2BackPatchLoc = CurrentCodeAddress(); /*if (true)-->Execute + Branch past else block */
         if (CurrentToken.code == ELSE)
-        {
-                Emit (I_BR,0); /*case of if+then+else, if branches around the else block here */
+        {                
+                L2BackPatchLoc = CurrentCodeAddress(); /*if (true)-->Execute + Branch past else block */
+                Emit (I_BR,0); /*case of if+then+else, if branches around the else block here */         
                 Accept ( ELSE );
                 Label1=CurrentCodeAddress();
                 BackPatch ( L1BackPatchLoc, Label1 );
@@ -623,16 +622,22 @@ PRIVATE void ParseIfStatement( void )
 
 PRIVATE void ParseReadStatement( void )
 {
-  
+        SYMBOL *target;
         Accept ( READ );    
+        Accept ( LEFTPARENTHESIS );
+        target = LookupSymbol(); /*Lookup Identifer in lookahead */
+        Accept ( IDENTIFIER );        
         _Emit ( I_READ );
-        Accept ( LEFTPARENTHESIS ); 
-        Accept ( IDENTIFIER );  
+        Emit ( I_STOREA,target->address);
 
         while (CurrentToken.code == COMMA)
         {
-                Accept ( COMMA );   
+                Accept ( COMMA );                
+                target = LookupSymbol(); /*Lookup Identifer in lookahead */
                 Accept ( IDENTIFIER );
+                _Emit ( I_READ );
+                Emit ( I_STOREA,target->address);
+                /*Assume we need multiple read/stores for multiple params */
         }
 
         Accept ( RIGHTPARENTHESIS );            
@@ -658,14 +663,14 @@ PRIVATE void ParseReadStatement( void )
 
 PRIVATE void ParseWriteStatement( void )
 {
-        Accept ( WRITE );     
-        _Emit ( I_WRITE );
+        Accept ( WRITE );   
         Accept ( LEFTPARENTHESIS ); 
-        ParseExpression();  
-    
+        ParseExpression();         
+        _Emit ( I_WRITE );
         while (CurrentToken.code == COMMA){
                 Accept ( COMMA );   
-                ParseExpression();
+                ParseExpression();                 
+                _Emit ( I_WRITE ); /*Assume we need multiple writes to handle multiple variables */
         }
 
         Accept ( RIGHTPARENTHESIS );            

@@ -1,7 +1,6 @@
 PROGRAM test7;
 BEGIN
-    READ( X, Y );
-    IF X > Y THEN  BEGIN
-	WRITE( X, Y, 1 );
+    IF 1 > 2 THEN  BEGIN
+	WRITE( 3, 4, 1 );
     END;
 END.

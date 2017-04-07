@@ -8,5 +8,5 @@ BEGIN
 END;
 
 BEGIN           ! main program starts here
-    muck( x,y,a,2,3,4 );
+    muck( 2,3,4 );
 END.

@@ -1,17 +1,12 @@
-  1 PROGRAM test9;
-  2 VAR  x, y
-  3 PROCEDURE z( REF a );
-    ^
-Syntax: Expected ;, got PROCEDURE
-
-  4 BEGIN;
-         ^
-Syntax: Expected one of: END IF READ WHILE WRITE Identifier : got ;
-
-         ^
-Syntax: Expected Identifier, got ;
-
-  5     a := x 
-               ^
-Resync at end of file 
-
+  1 PROGRAM test;
+  2 VAR x;
+  3 
+  4 PROCEDURE muck ( REF x );
+  5 VAR y;
+  6 BEGIN
+  7     y := x + 234/5;
+  8 END;
+  9 
+ 10 BEGIN           ! main program starts here
+ 11     muck( x );
+ 12 END.

@@ -415,7 +415,7 @@ PRIVATE void ParseProcCallList( void )
 /*                                                                          */
 /*  ParseAssignment implements:                                             */
 /*                                                                          */
-/*                 <Assignment> :== ":=" <Expression> 		            */
+/*                 <Assignment> :== ":=" <Expression> 		                */
 /*                                                                          */
 /*                                                                          */
 /*    Inputs:       None                                                    */
@@ -430,13 +430,8 @@ PRIVATE void ParseProcCallList( void )
 
 
 PRIVATE void ParseAssignment( void )
-{
-    
-    if (CurrentToken.code == ASSIGNMENT)
-    {
-      Accept ( ASSIGNMENT );            
-    }
-
+{    
+    Accept ( ASSIGNMENT );
     ParseExpression();
 
 }
@@ -502,7 +497,7 @@ PRIVATE void ParseWhileStatement( void )
 /*  ParseIfStatement implements:                                            */
 /*                                                                          */
 /*    <IfStatement> :==   "IF" <BooleanExpression> "THEN"                   */
-/*    <Block> ["ELSE" <BLOCK>]                                             */
+/*    <Block> ["ELSE" <BLOCK>]                                              */
 /*                                                                          */
 /*    Inputs:       None                                                    */
 /*                                                                          */
